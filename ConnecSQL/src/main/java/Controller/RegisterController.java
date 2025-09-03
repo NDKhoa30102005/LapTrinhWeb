@@ -10,23 +10,25 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-import Model.User;
+
 import Service.UserService;
 import Service.ServiceImplement.UserServiceImpl;
 
 /**
- * Servlet implementation class LoginController
+ * Servlet implementation class RegisterController
  */
+//@WebServlet("/RegisterController")
 @SuppressWarnings("serial")
-@WebServlet(urlPatterns = "/login")
-public class LoginController extends HttpServlet {
+@WebServlet(urlPatterns = "/register")
+
+public class RegisterController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	public static final String SESSION_USERNAME = "username";
-	public static final String COOKIE_REMEMBER = "username";
+	public static final String REGISTER = "/views/register.jsp";
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public LoginController() {
+	public RegisterController() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -37,68 +39,67 @@ public class LoginController extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		HttpSession session = req.getSession(false);
-		if (session != null && session.getAttribute("account") != null) {
-			resp.sendRedirect(req.getContextPath() + "/waiting");
+		if (session != null && session.getAttribute("username") != null) {
+			resp.sendRedirect(req.getContextPath() + "/admin");
 			return;
 		}
-		// Check cookie
 		Cookie[] cookies = req.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if (cookie.getName().equals("username")) {
 					session = req.getSession(true);
 					session.setAttribute("username", cookie.getValue());
-					resp.sendRedirect(req.getContextPath() + "/waiting");
+					resp.sendRedirect(req.getContextPath() + "/admin");
 					return;
 				}
 			}
 		}
-		req.getRequestDispatcher("views/login.jsp").forward(req, resp);
+		req.getRequestDispatcher(REGISTER).forward(req, resp);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
+	@SuppressWarnings("static-access")
+
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.setContentType("text/html");
 		resp.setCharacterEncoding("UTF-8");
 		req.setCharacterEncoding("UTF-8");
 		String username = req.getParameter("username");
 		String password = req.getParameter("password");
-		boolean isRememberMe = false;
-		String remember = req.getParameter("remember");
-
-		if ("on".equals(remember)) {
-			isRememberMe = true;
-		}
+		String email = req.getParameter("email");
+		String fullname = req.getParameter("fullname");
+		String phone = req.getParameter("phone");
+		UserService service = new UserServiceImpl();
 		String alertMsg = "";
-		if (username.isEmpty() || password.isEmpty()) {
-			alertMsg = "Tài khoản hoặc mật khẩu không được rỗng";
+		if (service.checkExistEmail(email)) {
+			alertMsg = "Email đã tồn tại!";
 			req.setAttribute("alert", alertMsg);
-			req.getRequestDispatcher("/login.jsp").forward(req, resp);
+			req.getRequestDispatcher(REGISTER).forward(req, resp);
 			return;
 		}
-		UserService service = new UserServiceImpl();
-		User user = service.login(username, password);
-		if (user != null) {
-			HttpSession session = req.getSession(true);
-			session.setAttribute("account", user);
-			if (isRememberMe) {
-				saveRemeberMe(resp, username);
-			}
-			resp.sendRedirect(req.getContextPath() + "/waiting");
-		} else {
-			alertMsg = "Tài khoản hoặc mật khẩu không đúng";
+		if (service.checkExistUsername(username)) {
+			alertMsg = "Tài khoản đã tồn tại!";
 			req.setAttribute("alert", alertMsg);
-			req.getRequestDispatcher("views/login.jsp").forward(req, resp);
+			req.getRequestDispatcher(REGISTER).forward(req, resp);
+			return;
+		}
+		
+		boolean isSuccess = service.register(username, password, email, fullname, phone);
+		if (isSuccess) {
+			System.out.print(email);
+			// SendMail sm = new SendMail();
+			// sm.sendMail(email, "Shopping.iotstar.vn", "Welcome to Shopping. Please Login
+			// to use service. Thanks !");
+			req.setAttribute("alert", alertMsg);
+		    req.setAttribute("success", "Đăng ký thành công! Mời bạn đăng nhập.");
+
+			//resp.sendRedirect(req.getContextPath() + "/login");
+		} else {
+			alertMsg = "System error!";
+			req.setAttribute("alert", alertMsg);
+			req.getRequestDispatcher(REGISTER).forward(req, resp);
 		}
 	}
-
-	private void saveRemeberMe(HttpServletResponse response, String username) {
-		Cookie cookie = new Cookie(COOKIE_REMEMBER, username);
-		cookie.setMaxAge(30 * 60);
-		response.addCookie(cookie);
-	}
-
 }

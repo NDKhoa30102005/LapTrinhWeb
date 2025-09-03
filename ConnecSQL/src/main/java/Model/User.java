@@ -14,6 +14,19 @@ public class User implements Serializable {
 	private String phone;
 	private Date createdDate;
 
+	public User(String email2, String username2, String fullname2, String password2, Object object, int i, String phone2, Date date) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.userName = userName;
+		this.fullName = fullName;
+		this.passWord = passWord;
+		this.avatar = avatar;
+		this.roleid = roleid;
+		this.phone = phone;
+		this.createdDate = createdDate;
+	}
+
 	public User() {
 		super();
 		this.id = id;
