@@ -9,10 +9,16 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import Model.Category;
 import Service.CategoryService;
 import Service.ServiceImplement.CategoryServiceImpl;
+import Utils.Constant;
 
 /**
  * Servlet implementation class CategoryEditController
@@ -46,41 +52,41 @@ public class CategoryEditController extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Category category = new Category();
-		DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
-		ServletFileUpload servletFileUpload = new ServletFileUpload(diskFileItemFactory);
-		servletFileUpload.setHeaderEncoding("UTF-8");
-		try {
-			resp.setContentType("text/html");
-			resp.setCharacterEncoding("UTF-8");
-			req.setCharacterEncoding("UTF-8");
-			List<FileItem> items = servletFileUpload.parseRequest(req);
-			for (FileItem item : items) {
-				if (item.getFieldName().equals("id")) {
-					category.setId(Integer.parseInt(item.getString()));
-				} else if (item.getFieldName().equals("name")) {
-					category.setName(item.getString("UTF-8"));
-				} else if (item.getFieldName().equals("icon")) {
-					if (item.getSize() > 0) {// neu co file d
-						String originalFileName = item.getName();
-						int index = originalFileName.lastIndexOf(".");
-						String ext = originalFileName.substring(index + 1);
-						String fileName = System.currentTimeMillis() + "." + ext;
-						File file = new File(Constant.DIR + "/category/" + fileName);
-						item.write(file);
-						category.setIcon("category/" + fileName);
-					} else {
-						category.setIcon(null);
-					}
-				}
-			}
-			cateService.edit(category);
-			resp.sendRedirect(req.getContextPath() + "/admin/category/list");
-		} catch (FileUploadException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//		Category category = new Category();
+//		DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
+//		ServletFileUpload servletFileUpload = new ServletFileUpload(diskFileItemFactory);
+//		servletFileUpload.setHeaderEncoding("UTF-8");
+//		try {
+//			resp.setContentType("text/html");
+//			resp.setCharacterEncoding("UTF-8");
+//			req.setCharacterEncoding("UTF-8");
+//			List<FileItem> items = servletFileUpload.parseRequest(req);
+//			for (FileItem item : items) {
+//				if (item.getFieldName().equals("id")) {
+//					category.setId(Integer.parseInt(item.getString()));
+//				} else if (item.getFieldName().equals("name")) {
+//					category.setName(item.getString("UTF-8"));
+//				} else if (item.getFieldName().equals("icon")) {
+//					if (item.getSize() > 0) {// neu co file d
+//						String originalFileName = item.getName();
+//						int index = originalFileName.lastIndexOf(".");
+//						String ext = originalFileName.substring(index + 1);
+//						String fileName = System.currentTimeMillis() + "." + ext;
+//						File file = new File(Constant.DIR + "/category/" + fileName);
+//						item.write(file);
+//						category.setIcon("category/" + fileName);
+//					} else {
+//						category.setIcon(null);
+//					}
+//				}
+//			}
+//			cateService.edit(category);
+//			resp.sendRedirect(req.getContextPath() + "/admin/category/list");
+//		} catch (FileUploadException e) {
+//			e.printStackTrace();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 }
