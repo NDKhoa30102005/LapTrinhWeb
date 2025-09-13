@@ -102,4 +102,64 @@ public class UserDaoImpl implements UserDao {
 		return false;
 	}
 
+	@Override
+	public User findByEmail(String email) {
+	    String sql = "SELECT * FROM [User] WHERE email = ?";
+	    try {
+	        conn = new DBConnection().getConnectionW();
+	        ps = conn.prepareStatement(sql);
+	        ps.setString(1, email);
+	        rs = ps.executeQuery();
+	        if (rs.next()) {
+	            User user = new User();
+	            user.setId(rs.getInt("id"));
+	            user.setEmail(rs.getString("email"));
+	            user.setUserName(rs.getString("username"));
+	            user.setFullName(rs.getString("fullname"));
+	            user.setPassWord(rs.getString("password"));
+	            user.setAvatar(rs.getString("avatar"));
+	            user.setRoleid(rs.getInt("roleid"));
+	            user.setPhone(rs.getString("phone"));
+	            user.setCreatedDate(rs.getDate("createddate"));
+	            return user;
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (ps != null) ps.close();
+	            if (conn != null) conn.close();
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
+	    }
+	    return null;
+	}
+
+	@Override
+	public boolean updatePasswordByEmail(String email, String newPassword) {
+	    String sql = "UPDATE [User] SET password = ? WHERE email = ?";
+	    try {
+	        conn = new DBConnection().getConnectionW();
+	        ps = conn.prepareStatement(sql);
+	        ps.setString(1, newPassword);
+	        ps.setString(2, email);
+
+	        int rows = ps.executeUpdate();
+	        return rows > 0; // true nếu update thành công
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (ps != null) ps.close();
+	            if (conn != null) conn.close();
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
+	    }
+	    return false;
+	}
+
+
 }

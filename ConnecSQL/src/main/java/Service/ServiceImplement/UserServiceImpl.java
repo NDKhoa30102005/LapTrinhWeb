@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
 		if (userDao.checkExistUsername(username)) {
 			return false;
 		}
-		
+
 		try {
 			User user = new User();
 			user.setUserName(username);
@@ -63,4 +63,15 @@ public class UserServiceImpl implements UserService {
 	public void insert(User user) {
 		userDao.insert(user);
 	}
+
+	@Override
+	public User findByEmail(String email) {
+		return userDao.findByEmail(email);
+	}
+
+	@Override
+	public boolean updatePasswordByEmail(String email, String newPassword) {
+		return userDao.updatePasswordByEmail(email, newPassword);
+	}
+
 }

@@ -73,7 +73,7 @@ body {
 						name="remember"> <label class="form-check-label"
 						for="remember">Nhớ tôi</label>
 				</div>
-				<a href="#">Quên mật khẩu?</a>
+				<a href="forgot-password">Quên mật khẩu?</a>
 			</div>
 
 			<!-- Nút login -->
